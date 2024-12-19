@@ -20,7 +20,7 @@ export function fetchNews(query, page = 0, pageSize = 12) {
       const queryStringPage1 = qs.stringify({
         ...query,
         page: page,
-        "api-key": {process.env.REACT_APP_API_KEY},
+        "api-key": process.env.REACT_APP_API_KEY,
       });
 
       const queryStringPage2 = qs.stringify({
