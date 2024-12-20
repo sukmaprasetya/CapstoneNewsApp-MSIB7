@@ -15,7 +15,7 @@ function Navbar() {
     if (searchQuery.trim()) {
       dispatch(searchNews(searchQuery));
       dispatch(setSearchTerm(searchQuery));
-      navigate("/search");
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
 
@@ -66,6 +66,7 @@ function Navbar() {
             }}
           />
         </a>
+
         <button
           className="navbar-toggler"
           type="button"
@@ -99,7 +100,7 @@ function Navbar() {
             ))}
           </ul>
         </div>
-
+        
         <div className="d-flex align-items-center" style={{ marginRight: "50px" }}>
         <form className="d-flex" onSubmit={handleSearch}>
           <input
