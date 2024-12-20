@@ -2,24 +2,27 @@ import { useSelector, useDispatch } from "react-redux";
 import { NewsCard } from "../components/NewsCard";
 import { NEWS_REDUCER_CASES } from "../store/reducers";
 import { useState, useEffect } from "react";
-import { fetchNews } from "../store/actions";
+import { fetchNews, setSearchTerm } from "../store/actions";
+import { useLocation } from "react-router-dom";
 
 function SearchPage() {
+  const location = useLocation();
   const newsReducer = useSelector((state) => state);
   const dispatch = useDispatch();
-
   const [currentPage, setCurrentPage] = useState(1);
   const newsPerPage = 12;
 
   const hasMore = newsReducer.totalResults > currentPage * newsPerPage;
 
   useEffect(() => {
-    const searchTerm = newsReducer.searchTerm || "";
-    if (searchTerm.trim() !== "") {
-      const query = { q: searchTerm };
-      dispatch(fetchNews(query, currentPage, newsPerPage));
+    const params = new URLSearchParams(location.search);
+    const query = params.get("q");
+
+    if (query && query.trim() !== "") {
+      dispatch(setSearchTerm(query));
+      dispatch(fetchNews({ q: query }, currentPage, newsPerPage));
     }
-  }, [newsReducer.searchTerm, currentPage, dispatch]);
+  }, [location.search, currentPage, dispatch]);
 
   const handleNextPage = () => {
     if (hasMore) setCurrentPage((prev) => prev + 1);
@@ -32,7 +35,9 @@ function SearchPage() {
   return (
     <main>
       <section className="container mt-4" style={{ paddingBottom: '20px' }}>
-      <h1 className="mb-4 text-left" style={{ fontSize: '35px' }}>Search Results for "{newsReducer.searchTerm}"</h1>
+        <h1 className="mb-4 text-left" style={{ fontSize: '35px' }}>
+          Search Results for "{newsReducer.searchTerm}"
+        </h1>
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
           {newsReducer.searchResults.map((n) => {
             const { headline, abstract, source, byline, imageUrl, web_url } = n;
@@ -56,12 +61,9 @@ function SearchPage() {
             );
           })}
         </div>
-        {/* Pagination */}
         <div 
           className="d-flex justify-content-center mt-4 gap-2"
-          style={{ 
-            paddingTop: '20px'
-          }}
+          style={{ paddingTop: '20px' }}
         >
           <button
             className="btn btn-primary"
